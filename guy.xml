@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+const int MAX_ENV = 9;
+typedef int[0, MAX_ENV-1] env_t;
+const env_t ENVS = 8;
+const env_t ID = 0;
+const env_t COMPO = 1;
+const env_t CAMERA1 = 2;
+const env_t MICRO1 = 3;
+const env_t MICRO2 = 4;
+const env_t NFC1 = 5;
+const env_t KEYBOARD1 = 6;
+const env_t DEVICE1 = 7;
+
+const env_t SVDT = 0;
+const env_t DVDT = 1;
+const env_t CVDT = 2;
+const env_t MSG = 3;
+const env_t APP = 4;
+const env_t STOP = 5;
+const env_t API = 6;
+const env_t APII = 7;
+
+const env_t MONI_PUT = 0;
+const env_t MONI_GET = 1;
+const env_t CONF_ALLOC = 2;
+const env_t CONF_FREE = 3;
+const env_t PROV_ALOC = 4;
+const env_t PROV_TERM = 5;
+const env_t PROV_CONN = 6;
+const env_t PROV_DISCO = 7;
+
+struct
+{
+  env_t id;
+  env_t type;
+} env_s;
+
+// The web service communication channel  
+chan ws[MAX_ENV][MAX_ENV];
+
+// Represents the Screen of the mobile device.
+chan screen;
+// Abstraction of the communication infrastructure WS 
+chan infra;
+</declaration><template><name x="5" y="5">VDR</name><declaration>// Place local declarations here.
+</declaration><location id="id0" x="64" y="8"></location><init ref="id0"/></template><template><name>Orchestrator</name><location id="id1" x="0" y="0"></location><init ref="id1"/></template><template><name>User</name><location id="id2" x="-72" y="-56"><name x="-82" y="-86">Touched</name></location><location id="id3" x="-208" y="-56"><name x="-218" y="-86">Idle</name></location><init ref="id3"/><transition><source ref="id2"/><target ref="id3"/><nail x="-136" y="8"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="-168" y="-152">screen?</label><nail x="-144" y="-128"/></transition></template><template><name>DeviceLocal</name><location id="id4" x="-496" y="-808"></location><init ref="id4"/></template><template><name>DeviceRemote</name><location id="id5" x="0" y="0"></location><init ref="id5"/></template><template><name>FrontEnd</name><location id="id6" x="-112" y="-56"><name x="-122" y="-86">Response</name></location><location id="id7" x="-256" y="-56"><name x="-288" y="-88">Touched</name></location><location id="id8" x="-392" y="-56"><name x="-402" y="-86">Idle</name></location><init ref="id8"/><transition><source ref="id6"/><target ref="id8"/><nail x="-264" y="32"/></transition><transition><source ref="id7"/><target ref="id6"/><label kind="synchronisation" x="-232" y="-80">ws[MSG][APP]?</label></transition><transition><source ref="id8"/><target ref="id7"/><label kind="synchronisation" x="-352" y="-80">screen!</label></transition></template><template><name>BackEnd</name><location id="id9" x="-536" y="-208"><name x="-546" y="-238">End</name></location><location id="id10" x="-672" y="-136"><name x="-696" y="-176">LocalExec</name></location><location id="id11" x="-664" y="-288"><name x="-704" y="-264">RemoteExec</name></location><location id="id12" x="-800" y="-216"><name x="-824" y="-256">Invoked</name></location><location id="id13" x="-944" y="-216"><name x="-954" y="-246">Idle</name></location><init ref="id13"/><transition><source ref="id11"/><target ref="id9"/></transition><transition><source ref="id10"/><target ref="id10"/><nail x="-624" y="-88"/><nail x="-624" y="-88"/><nail x="-720" y="-88"/></transition><transition><source ref="id10"/><target ref="id9"/></transition><transition><source ref="id12"/><target ref="id10"/></transition><transition><source ref="id12"/><target ref="id11"/></transition><transition><source ref="id13"/><target ref="id12"/><label kind="synchronisation" x="-928" y="-240">ws[MSG][APP]!</label></transition></template><system>// Place template instantiations here.
+frontEnd = FrontEnd();
+user = User();
+
+// List one or more processes to be composed into a system.
+system user, frontEnd;</system></nta>

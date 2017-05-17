@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+
+// event vector
+const int EVT_SIZE = 10;
+
+typedef int[0, EVT_SIZE - 1] EvtType;
+chan evt[EVT_SIZE];
+chan evt_c[EVT_SIZE];
+
+
+// event vector elements
+const EvtType ID = 0;
+const EvtType C = 1;
+const EvtType CAMERA_1 = 2;
+const EvtType MICRO_1 = 3;
+const EvtType MICRO_2 = 4;
+const EvtType NFC_1 = 5;
+const EvtType KEYBOARD_1 = 6;
+const EvtType SENSOR_1 = 7;
+const EvtType SENSOR_2 = 8;
+const EvtType SENSOR_3 = 9;
+
+// Type id
+const int ID_TYPE_SIZE = 4;
+//const int ID_SIZE = 10;
+typedef int[0, ID_TYPE_SIZE-1] IdType;
+const IdType UNDEF_VDR = 0;
+const IdType D_VDR = 1;
+const IdType S_VDR = 2;
+const IdType C_VDR = 3;
+
+// Type id
+const int COMM_TYPE_SIZE = 10;
+typedef int[0, COMM_TYPE_SIZE -1 ] CommType;
+
+// Concrete behavior chanel
+const CommType STOP = 0;
+const CommType APP = 0;
+const CommType C_SIZE = 9;
+chan cChan[C_SIZE];
+chan pChan[C_SIZE];
+
+// devchan size
+const CommType DEV_SIZE = 9;
+chan devchan[DEV_SIZE][DEV_SIZE];
+
+// Conceate processor
+const CommType CON_DEV_SIZE = 3;
+chan conDevChan[VIR_DEV_SIZE];
+// Virtual device 
+const CommType VIR_DEV_SIZE = 3;
+chan virDevChan[VIR_DEV_SIZE];
+// web service (ws) 
+const CommType WS_SIZE = 9;
+chan ws[WS_SIZE];
+
+
+const CommType CALLBACK_SIZE = 9;
+chan cb[CALLBACK_SIZE];
+
+
+// Cloud types
+
+// Type id
+const int API_SIZE = 3;
+typedef int[0, API_SIZE-1] ApiType;
+const ApiType PROV = 0;
+const ApiType MONI = 1;
+const ApiType CONF = 2;
+
+const ApiType PROV_R = 0;
+const ApiType PROV_S = 1;
+const ApiType PROV_T = 2;
+const ApiType MONI_PUT = 0;
+const ApiType MONI_GET = 1;
+const ApiType CONF_A = 0;
+const ApiType CONF_F = 1;
+const ApiType CONF_S = 2;
+chan api[API_SIZE][API_SIZE][API_SIZE];
+
+
+// devchan size
+chan initApiChan[API_SIZE];
+</declaration><template><name x="5" y="5">SVDR</name><declaration>IdType id;
+EvtType ev;
+</declaration><location id="id0" x="-768" y="48"><name x="-778" y="18">Started</name></location><location id="id1" x="-616" y="-216"><name x="-626" y="-246">ParamRetrieval</name></location><location id="id2" x="-768" y="-80"><name x="-778" y="-110">IdRegistred</name></location><location id="id3" x="-608" y="-80"><name x="-618" y="-110">Tau</name></location><location id="id4" x="-768" y="-216"><name x="-778" y="-246">idle</name></location><init ref="id4"/><transition><source ref="id1"/><target ref="id3"/><label kind="select" x="-600" y="-189">id_p : IdType</label><label kind="synchronisation" x="-600" y="-159">ws[id_p]?</label><label kind="assignment" x="-600" y="-144">id := id_p</label></transition><transition><source ref="id2"/><target ref="id0"/><label kind="synchronisation" x="-840" y="-24">virDevChan[S_VDR]!</label></transition><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="-744" y="-72">devchan[id][ev]!</label></transition><transition><source ref="id4"/><target ref="id1"/><label kind="select" x="-712" y="-264">ev_p : EvtType</label><label kind="synchronisation" x="-704" y="-240">evt[ev_p]?</label><label kind="assignment" x="-704" y="-216">ev := ev_p</label></transition></template><template><name>DevId</name><declaration>IdType id;
+EvtType ev = 0;
+CommType cbId = 0;</declaration><location id="id5" x="-712" y="-216"><name x="-722" y="-246">Idle</name></location><location id="id6" x="-312" y="-216"><name x="-322" y="-246">Callback</name></location><location id="id7" x="-536" y="-216"><name x="-546" y="-246">Loop</name></location><init ref="id5"/><transition><source ref="id5"/><target ref="id7"/><label kind="select" x="-680" y="-208">id_p : IdType ,
+ev_p : EvtType</label><label kind="synchronisation" x="-680" y="-178">devchan[id_p][ev_p]?</label><label kind="assignment" x="-680" y="-163">id := id_p,
+ev := ev_p</label></transition><transition><source ref="id6"/><target ref="id7"/><label kind="synchronisation" x="-440" y="-112">cb[cbId]!</label><nail x="-424" y="-112"/></transition><transition><source ref="id7"/><target ref="id6"/><label kind="select" x="-488" y="-280">cb_p : CommType</label><label kind="synchronisation" x="-480" y="-264">evt[cb_p]?</label><label kind="assignment" x="-464" y="-248">cbId := cb_p</label></transition></template><template><name>VirtualSensor</name><declaration>CommType c;
+IdType vdr;</declaration><location id="id8" x="-600" y="-32"><name x="-610" y="-62">Idle</name></location><location id="id9" x="-256" y="112"><name x="-266" y="82">ConcreteBehavior</name></location><location id="id10" x="-104" y="-32"><name x="-114" y="-62">Stoped</name></location><location id="id11" x="-256" y="-32"><name x="-266" y="-62">Action</name></location><location id="id12" x="-432" y="-32"><name x="-442" y="-62">Started</name></location><init ref="id8"/><transition><source ref="id8"/><target ref="id12"/><label kind="synchronisation" x="-584" y="-56">virDevChan[S_VDR]?</label></transition><transition><source ref="id9"/><target ref="id12"/></transition><transition><source ref="id11"/><target ref="id9"/><label kind="guard" x="-316" y="10">c != STOP</label><label kind="synchronisation" x="-316" y="25">cChan[c]!</label></transition><transition><source ref="id11"/><target ref="id10"/><label kind="guard" x="-224" y="-80">c == STOP</label></transition><transition><source ref="id12"/><target ref="id11"/><label kind="select" x="-404" y="-77">c_p : CommType</label><label kind="synchronisation" x="-404" y="-47">ws[c_p]?</label><label kind="assignment" x="-404" y="-32">c := c_p</label></transition></template><template><name>DVDR</name><declaration>IdType id;
+EvtType ev;
+</declaration><location id="id13" x="-312" y="216"><name x="-322" y="186">Started</name></location><location id="id14" x="-312" y="40"><name x="-322" y="10">IdRegistred</name></location><location id="id15" x="-104" y="40"><name x="-114" y="10">Tau</name></location><location id="id16" x="-104" y="-128"><name x="-114" y="-158">ParamRetrieval</name></location><location id="id17" x="-312" y="-128"><name x="-322" y="-158">Idle</name></location><init ref="id17"/><transition><source ref="id14"/><target ref="id13"/><label kind="synchronisation" x="-372" y="113">virDevChan[D_VDR]!</label></transition><transition><source ref="id15"/><target ref="id14"/><label kind="synchronisation" x="-240" y="16">devchan[id][ev]!</label></transition><transition><source ref="id16"/><target ref="id15"/><label kind="select" x="-164" y="-89">id_p : IdType</label><label kind="synchronisation" x="-164" y="-59">ws[id_p]?</label><label kind="assignment" x="-164" y="-44">id := id_p</label></transition><transition><source ref="id17"/><target ref="id16"/><label kind="select" x="-268" y="-173">ev_p : EvtType</label><label kind="synchronisation" x="-268" y="-143">evt[ev_p]?</label><label kind="assignment" x="-268" y="-128">ev := ev_p</label></transition></template><template><name>VirtualDevice</name><declaration>CommType c;
+IdType vdr;</declaration><location id="id18" x="-304" y="-312"><name x="-314" y="-342">Offload</name></location><location id="id19" x="-304" y="0"><name x="-314" y="-30">ConcreteBehavior</name></location><location id="id20" x="-88" y="-176"><name x="-98" y="-206">Stoped</name></location><location id="id21" x="-304" y="-176"><name x="-314" y="-206">Action</name></location><location id="id22" x="-496" y="-176"><name x="-506" y="-206">Started</name></location><location id="id23" x="-696" y="-176"><name x="-706" y="-206">Idle</name></location><init ref="id23"/><transition><source ref="id18"/><target ref="id22"/><nail x="-320" y="-304"/></transition><transition><source ref="id21"/><target ref="id18"/><label kind="guard" x="-364" y="-274">c == APP</label><label kind="synchronisation" x="-364" y="-259">pChan[c]!</label></transition><transition><source ref="id19"/><target ref="id22"/></transition><transition><source ref="id21"/><target ref="id19"/><label kind="guard" x="-364" y="-118">c != STOP &amp;&amp; c != APP</label><label kind="synchronisation" x="-364" y="-103">cChan[c]!</label></transition><transition><source ref="id21"/><target ref="id20"/><label kind="guard" x="-256" y="-206">c == STOP</label></transition><transition><source ref="id22"/><target ref="id21"/><label kind="select" x="-460" y="-221">c_p : CommType</label><label kind="synchronisation" x="-460" y="-191">ws[c_p]?</label><label kind="assignment" x="-460" y="-176">c := c_p</label></transition><transition><source ref="id23"/><target ref="id22"/><label kind="synchronisation" x="-664" y="-200">virDevChan[D_VDR]?</label></transition></template><template><name>Orchestrator</name><location id="id24" x="-160" y="0"><name x="-170" y="-30">ConfStarted</name></location><location id="id25" x="272" y="0"><name x="262" y="-30">MoniStarted</name></location><location id="id26" x="32" y="0"><name x="22" y="-30">ProvStarted</name></location><location id="id27" x="-360" y="0"><name x="-370" y="-30">Idle</name></location><init ref="id27"/><transition><source ref="id26"/><target ref="id25"/><label kind="synchronisation" x="92" y="-15">initApiChan[MONI]!</label></transition><transition><source ref="id24"/><target ref="id26"/><label kind="synchronisation" x="-124" y="-15">initApiChan[PROV]!</label></transition><transition><source ref="id27"/><target ref="id24"/><label kind="synchronisation" x="-320" y="-15">initApiChan[CONF]!</label></transition></template><template><name>Configuration</name><location id="id28" x="-296" y="24"><name x="-306" y="-6">Idle</name></location><location id="id29" x="-200" y="136"><name x="-210" y="106">SuspendRequest</name></location><location id="id30" x="0" y="168"><name x="-10" y="138">Tau</name></location><location id="id31" x="96" y="136"><name x="86" y="106">FreeRequest</name></location><location id="id32" x="128" y="-8"><name x="118" y="-38">Tau</name></location><location id="id33" x="32" y="-200"><name x="22" y="-230">InitAllocation</name></location><location id="id34" x="-240" y="-96"><name x="-250" y="-126">AllocationCallback</name></location><location id="id35" x="-184" y="-200"><name x="-194" y="-230">Tau</name></location><location id="id36" x="96" y="-96"><name x="86" y="-126">AllocationRequest</name></location><location id="id37" x="-62" y="6"><name x="-88" y="-32">Started</name></location><init ref="id28"/><transition><source ref="id28"/><target ref="id37"/><label kind="synchronisation" x="-239" y="0">initApiChan[CONF]?</label></transition><transition><source ref="id30"/><target ref="id37"/></transition><transition><source ref="id29"/><target ref="id30"/></transition><transition><source ref="id37"/><target ref="id29"/></transition><transition><source ref="id32"/><target ref="id37"/></transition><transition><source ref="id31"/><target ref="id32"/></transition><transition><source ref="id37"/><target ref="id31"/></transition><transition><source ref="id34"/><target ref="id37"/></transition><transition><source ref="id35"/><target ref="id34"/></transition><transition><source ref="id33"/><target ref="id35"/></transition><transition><source ref="id36"/><target ref="id33"/></transition><transition><source ref="id37"/><target ref="id36"/></transition></template><template><name>Provisioning</name><location id="id38" x="-504" y="80"></location><location id="id39" x="-480" y="112"></location><location id="id40" x="-416" y="128"></location><location id="id41" x="-296" y="120"></location><location id="id42" x="-192" y="112"></location><location id="id43" x="-104" y="56"></location><location id="id44" x="-368" y="-184"></location><location id="id45" x="-184" y="-176"></location><location id="id46" x="-88" y="-56"></location><location id="id47" x="-280" y="-8"></location><location id="id48" x="-584" y="-8"></location><init ref="id48"/><transition><source ref="id48"/><target ref="id47"/><label kind="synchronisation" x="-512" y="-32">initApiChan[PROV]?</label></transition></template><template><name>Monitoring</name><location id="id49" x="168" y="144"><name x="158" y="114">Data</name></location><location id="id50" x="-80" y="136"><name x="-90" y="106">Id</name></location><location id="id51" x="-80" y="-104"><name x="-90" y="-134">Callback</name></location><location id="id52" x="80" y="-168"><name x="70" y="-198">Tau</name></location><location id="id53" x="224" y="-80"><name x="214" y="-110">Datum</name></location><location id="id54" x="48" y="0"><name x="38" y="-30">Started</name></location><location id="id55" x="-192" y="0"></location><init ref="id55"/><transition><source ref="id49"/><target ref="id54"/></transition><transition><source ref="id50"/><target ref="id49"/></transition><transition><source ref="id54"/><target ref="id50"/></transition><transition><source ref="id51"/><target ref="id54"/></transition><transition><source ref="id52"/><target ref="id51"/></transition><transition><source ref="id53"/><target ref="id52"/></transition><transition><source ref="id54"/><target ref="id53"/></transition><transition><source ref="id55"/><target ref="id54"/><label kind="synchronisation" x="-132" y="-19">initApiChan[MONI]?</label></transition></template><template><name>CVDR</name><location id="id56" x="-432" y="16"></location><location id="id57" x="-640" y="16"></location><location id="id58" x="-640" y="-144"><name x="-650" y="-174">IdRegistred</name></location><location id="id59" x="-432" y="-144"><name x="-442" y="-174">ParamReteived</name></location><location id="id60" x="-432" y="-312"><name x="-442" y="-342">ParamRetreival</name></location><location id="id61" x="-640" y="-312"><name x="-650" y="-342">Idle</name></location><init ref="id61"/><transition><source ref="id57"/><target ref="id56"/><label kind="synchronisation" x="-592" y="-8">conDevChan[c]!</label></transition><transition><source ref="id58"/><target ref="id57"/><label kind="synchronisation" x="-700" y="-79">virDevChan[C_VDR]!</label></transition><transition><source ref="id59"/><target ref="id58"/><label kind="synchronisation" x="-576" y="-168">devchan[id][ev]!</label></transition><transition><source ref="id60"/><target ref="id59"/><label kind="select" x="-492" y="-273">c_p : CommType</label><label kind="synchronisation" x="-492" y="-243">ws[c_p]?</label><label kind="assignment" x="-492" y="-228">c := c_p</label></transition><transition><source ref="id61"/><target ref="id60"/><label kind="select" x="-596" y="-357">ev_p : EvtType</label><label kind="synchronisation" x="-600" y="-336">evt[ev_p]?</label><label kind="assignment" x="-596" y="-312">ev := ev_p</label></transition></template><template><name>CompositeDevice</name><location id="id62" x="-608" y="-88"></location><location id="id63" x="-832" y="-88"><name x="-842" y="-118">Idle</name></location><init ref="id63"/><transition><source ref="id63"/><target ref="id62"/><label kind="synchronisation" x="-780" y="-103">virDevChan[C_VDR]?</label></transition></template><system>// callback vector as a substitution for higher order parameter
+
+
+
+
+svdr = SVDR();
+
+devid = DevId();
+
+virtualSensor = VirtualSensor();
+// List one or more processes to be composed into a system.
+system svdr , devid, virtualSensor;</system></nta>
