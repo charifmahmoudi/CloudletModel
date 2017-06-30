@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
 const int MAX_ENV = 9;
+const int MAX_LOC = 2;
+typedef int[0, MAX_LOC-1] loc_t;
 typedef int[0, MAX_ENV-1] env_t;
 const env_t ENVS = 8;
+
+const env_t LOCAL_WS = 0;
+const env_t CLOUDLET_WS = 1;
+
 const env_t ID = 0;
 const env_t COMPO = 1;
 const env_t CAMERA1 = 2;
@@ -35,17 +41,28 @@ struct
   env_t type;
 } env_s;
 
-// The web service communication channel  
-chan ws[MAX_ENV][MAX_ENV];
+//typedef chan[0,MAX_ENV] ChanWS;
 
+//typedef int [0,MAX_ENV] ChanWS1d ;
+//typedef int [0,MAX_ENV] ChanWS ;
+
+// The web service communication channel  
+chan ws[MAX_LOC][MAX_ENV][MAX_ENV];
+chan P[MAX_LOC];
 // Represents the Screen of the mobile device.
 chan screen;
 // Abstraction of the communication infrastructure WS 
 chan infra;
 </declaration><template><name x="5" y="5">VDR</name><declaration>// Place local declarations here.
-</declaration><location id="id0" x="64" y="8"></location><init ref="id0"/></template><template><name>Orchestrator</name><location id="id1" x="0" y="0"></location><init ref="id1"/></template><template><name>User</name><location id="id2" x="-72" y="-56"><name x="-82" y="-86">Touched</name></location><location id="id3" x="-208" y="-56"><name x="-218" y="-86">Idle</name></location><init ref="id3"/><transition><source ref="id2"/><target ref="id3"/><nail x="-136" y="8"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="-168" y="-152">screen?</label><nail x="-144" y="-128"/></transition></template><template><name>DeviceLocal</name><location id="id4" x="-496" y="-808"></location><init ref="id4"/></template><template><name>DeviceRemote</name><location id="id5" x="0" y="0"></location><init ref="id5"/></template><template><name>FrontEnd</name><location id="id6" x="-112" y="-56"><name x="-122" y="-86">Response</name></location><location id="id7" x="-256" y="-56"><name x="-288" y="-88">Touched</name></location><location id="id8" x="-392" y="-56"><name x="-402" y="-86">Idle</name></location><init ref="id8"/><transition><source ref="id6"/><target ref="id8"/><nail x="-264" y="32"/></transition><transition><source ref="id7"/><target ref="id6"/><label kind="synchronisation" x="-232" y="-80">ws[MSG][APP]?</label></transition><transition><source ref="id8"/><target ref="id7"/><label kind="synchronisation" x="-352" y="-80">screen!</label></transition></template><template><name>BackEnd</name><location id="id9" x="-536" y="-208"><name x="-546" y="-238">End</name></location><location id="id10" x="-672" y="-136"><name x="-696" y="-176">LocalExec</name></location><location id="id11" x="-664" y="-288"><name x="-704" y="-264">RemoteExec</name></location><location id="id12" x="-800" y="-216"><name x="-824" y="-256">Invoked</name></location><location id="id13" x="-944" y="-216"><name x="-954" y="-246">Idle</name></location><init ref="id13"/><transition><source ref="id11"/><target ref="id9"/></transition><transition><source ref="id10"/><target ref="id10"/><nail x="-624" y="-88"/><nail x="-624" y="-88"/><nail x="-720" y="-88"/></transition><transition><source ref="id10"/><target ref="id9"/></transition><transition><source ref="id12"/><target ref="id10"/></transition><transition><source ref="id12"/><target ref="id11"/></transition><transition><source ref="id13"/><target ref="id12"/><label kind="synchronisation" x="-928" y="-240">ws[MSG][APP]!</label></transition></template><system>// Place template instantiations here.
-frontEnd = FrontEnd();
+</declaration><location id="id0" x="64" y="8"></location><init ref="id0"/></template><template><name>Orchestrator</name><location id="id1" x="0" y="0"></location><init ref="id1"/></template><template><name>User</name><location id="id2" x="-72" y="-56"><name x="-82" y="-86">Touched</name></location><location id="id3" x="-208" y="-56"><name x="-218" y="-86">Idle</name></location><init ref="id3"/><transition><source ref="id2"/><target ref="id3"/><nail x="-136" y="8"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="-168" y="-152">screen?</label><nail x="-144" y="-128"/></transition></template><template><name>DeviceLocal</name><location id="id4" x="-496" y="-808"></location><init ref="id4"/></template><template><name>DeviceRemote</name><location id="id5" x="0" y="0"></location><init ref="id5"/></template><template><name>FrontEnd</name><parameter>env_t location</parameter><location id="id6" x="-24" y="-56"><name x="-34" y="-86">Response</name></location><location id="id7" x="-256" y="-56"><name x="-288" y="-88">Touched</name></location><location id="id8" x="-392" y="-56"><name x="-402" y="-86">Idle</name></location><init ref="id8"/><transition><source ref="id6"/><target ref="id8"/><nail x="-264" y="32"/></transition><transition><source ref="id7"/><target ref="id6"/><label kind="synchronisation" x="-232" y="-80">ws[location][APP][APP]?</label></transition><transition><source ref="id8"/><target ref="id7"/><label kind="synchronisation" x="-352" y="-80">screen!</label></transition></template><template><name>BackEnd</name><parameter>env_t  appli</parameter><declaration>loc_t infra = 0;</declaration><location id="id9" x="-512" y="-200"><name x="-522" y="-230">End</name></location><location id="id10" x="-672" y="-136"><name x="-696" y="-176">LocalExec</name></location><location id="id11" x="-664" y="-288"><name x="-704" y="-264">RemoteExec</name></location><location id="id12" x="-824" y="-216"><name x="-848" y="-256">Invoked</name></location><location id="id13" x="-1144" y="-216"><name x="-1154" y="-246">Idle</name></location><init ref="id13"/><transition><source ref="id9"/><target ref="id13"/><nail x="-504" y="8"/><nail x="-1152" y="8"/></transition><transition><source ref="id11"/><target ref="id9"/><label kind="synchronisation" x="-624" y="-296">ws[CLOUDLET_WS][APP][appli]?</label></transition><transition><source ref="id10"/><target ref="id10"/><nail x="-624" y="-88"/><nail x="-624" y="-88"/><nail x="-720" y="-88"/></transition><transition><source ref="id10"/><target ref="id9"/><label kind="synchronisation" x="-608" y="-160">P[0]?</label></transition><transition><source ref="id12"/><target ref="id10"/><label kind="guard" x="-840" y="-168">infra == LOCAL_WS</label></transition><transition><source ref="id12"/><target ref="id11"/><label kind="guard" x="-824" y="-288">infra != LOCAL_WS</label></transition><transition><source ref="id13"/><target ref="id12"/><label kind="select" x="-1080" y="-280">service_index : loc_t</label><label kind="synchronisation" x="-1096" y="-248">ws[service_index][APP][appli]!</label><label kind="assignment" x="-1104" y="-216">infra := service_index</label></transition></template><template><name>VirtualDevice</name><declaration>env_t x = 0;</declaration><location id="id14" x="200" y="-16"></location><location id="id15" x="40" y="104"></location><location id="id16" x="120" y="-8"></location><location id="id17" x="40" y="-104"></location><location id="id18" x="-240" y="-8"><name x="-250" y="-38">Idle</name></location><init ref="id18"/><transition><source ref="id14"/><target ref="id18"/><nail x="200" y="224"/><nail x="-240" y="216"/></transition><transition><source ref="id17"/><target ref="id14"/><label kind="synchronisation" x="112" y="-96">ws[LOCAL_WS][APP][x]?</label></transition><transition><source ref="id18"/><target ref="id15"/><label kind="select" x="-160" y="3">cmd : env_t</label><label kind="synchronisation" x="-160" y="33">ws[CLOUDLET_WS][MSG][cmd]!</label></transition><transition><source ref="id18"/><target ref="id16"/><label kind="synchronisation" x="-160" y="-23">ws[CLOUDLET_WS][STOP][STOP]!</label></transition><transition><source ref="id18"/><target ref="id17"/><label kind="select" x="-160" y="-101">param : env_t</label><label kind="synchronisation" x="-160" y="-71">ws[CLOUDLET_WS][APP][param]!</label><label kind="assignment" x="-160" y="-56">x := param</label></transition></template><template><name>Process</name><parameter>env_t x</parameter><location id="id19" x="40" y="-32"><name x="30" y="-62">Tau</name></location><location id="id20" x="-144" y="-24"><name x="-154" y="-54">Idle</name></location><init ref="id20"/><transition><source ref="id19"/><target ref="id20"/><nail x="-48" y="48"/></transition><transition><source ref="id20"/><target ref="id19"/><label kind="synchronisation" x="-80" y="-120">P[x]!</label><nail x="-56" y="-96"/><nail x="-56" y="-96"/></transition></template><system>// Place template instantiations here.
+frontEnd = FrontEnd(CLOUDLET_WS);
 user = User();
 
+env_t apps;
+//localBackEnd = BackEnd;
+
+P0 = Process(0);
+
+
 // List one or more processes to be composed into a system.
-system user, frontEnd;</system></nta>
+system user, frontEnd, BackEnd , P0;</system></nta>
